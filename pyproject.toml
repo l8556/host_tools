@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "host-control"
+version = "1.0"
+description = ""
+authors = ["l02 <l8556@outlook.com>"]
+readme = "README.md"
+repository='https://github.com/l8556/host_control'
+classifiers=[
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: Implementation :: PyPy',
+    'Programming Language :: Python :: Implementation :: CPython',
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.7"
+xlib = "^0.21"
+py7zr = "^0.20.6"
+pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
+distro = "^1.8.0"
+requests = "^2.31.0"
+rich = "^13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
