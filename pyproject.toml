@@ -21,7 +21,7 @@ classifiers=[
 
 [tool.poetry.dependencies]
 python = "^3.7"
-xlib = "^0.21"
+python-xlib = '^0.33'
 py7zr = "^0.20.6"
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
 distro = "^1.8.0"
