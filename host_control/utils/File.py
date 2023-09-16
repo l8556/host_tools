@@ -82,6 +82,11 @@ class File:
 
     @staticmethod
     def compress(path: str, archive_path: str = None, delete: bool = False) -> None:
+        """
+        :param path: Path to compression files.
+        :param archive_path: Path to the archive file.
+        :param delete:  Deleting files after compression.
+        """
         _name = basename(Str.delete_last_slash(path))
         _archive_path = archive_path if archive_path else join(dirname(path) if isfile(path) else path, f"{_name}.zip")
 
