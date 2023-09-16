@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from shutil import rmtree
 from os import makedirs, scandir, walk
-from os.path import exists, isdir, join
+from os.path import isdir, join
 from rich import print
 
 
-def create(dir_path: "str | tuple", stdout: bool = True) -> None:
+def create(dir_path: "str | tuple", stdout: bool = True, stderr: bool = True) -> None:
     for _dir_path in dir_path if isinstance(dir_path, tuple) else [dir_path]:
-        if not exists(_dir_path):
+        if not isdir(_dir_path):
             makedirs(_dir_path)
 
             if isdir(_dir_path):
                 print(f'[green]|INFO| Folder Created: {_dir_path}') if stdout else ...
                 continue
-            print(f'[bold red]|WARNING| Create folder warning. Folder not created: {_dir_path}')
+            print(f'[bold red]|WARNING| Create folder warning. Folder not created: {_dir_path}') if stderr else ...
             continue
 
         print(f'[green]|INFO| Folder exists: {_dir_path}') if stdout else ...

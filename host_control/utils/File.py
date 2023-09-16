@@ -7,7 +7,7 @@ from host_control.utils import Dir, Shell, Str
 from random import randint
 from shutil import move, copytree, copyfile
 from os import remove, walk, listdir, scandir
-from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath
+from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath, dirname
 from tempfile import gettempdir
 from platform import system
 from requests import get, head
@@ -82,28 +82,33 @@ class File:
 
     @staticmethod
     def compress(path: str, archive_path: str = None, delete: bool = False) -> None:
-        archive = archive_path if archive_path else join(path, f"{basename(path)}.zip")
-        compress_exception_names: list = ['.DS_Store', f"{basename(archive)}"]
+        """
+        :param path: Path to compression files.
+        :param archive_path: Path to the archive file.
+        :param delete:  Deleting files after compression.
+        """
+        _name = basename(Str.delete_last_slash(path))
+        _archive_path = archive_path if archive_path else join(dirname(path) if isfile(path) else path, f"{_name}.zip")
 
         if not exists(path):
-            return print(f'[bold red]| COMPRESS WARNING| Path for compression does not exist: {path}')
-        print(f'[green]|INFO| Compressing: {path}')
+            return print(f'[bold red]|COMPRESS WARNING| Path for compression does not exist: {path}')
 
-        with ZipFile(archive, 'w') as _zip:
-            if isfile(path):
-                _zip.write(path, basename(path), compress_type=ZIP_DEFLATED)
-            elif isdir(path):
-                for file in track(File.get_paths(path), description=f"[red]Compressing dir: {basename(path)}"):
-                    if basename(file) not in compress_exception_names:
+        Dir.create(dirname(_archive_path), stdout=False)
+        with ZipFile(_archive_path, 'w') as _zip:
+            if isdir(path):
+                exceptions = File.EXCEPTIONS + [f"{basename(_archive_path)}"]
+                for file in track(File.get_paths(path), description=f"[green]|INFO| Compressing dir: {_name}"):
+                    if basename(file) not in exceptions:
                         _zip.write(file, relpath(file, path), compress_type=ZIP_DEFLATED)
+                        File.delete(file) if delete else ...
             else:
-                return print(f"[red]|WARNING| The path for archiving is neither a file_name nor a directory: {path}")
+                print(f'[green]|INFO| Compressing file: {path}')
+                _zip.write(path, _name, compress_type=ZIP_DEFLATED)
+                File.delete(path) if delete else ...
 
-        if exists(archive) and getsize(archive) != 0:
-            File.delete(path) if delete else ...
-            return print(f"[green]|INFO| Success compressed: {archive}")
-
-        print(f"[WARNING] Archive not exists: {archive}")
+        if exists(_archive_path) and getsize(_archive_path) != 0:
+            return print(f"[green]|INFO| Success compressed: {_archive_path}")
+        print(f"[WARNING] Archive not exists: {_archive_path}")
 
     @staticmethod
     def read_json(path_to_json: str, encoding: str = "utf_8_sig") -> json:
@@ -200,7 +205,7 @@ class File:
     @staticmethod
     def get_paths(
             path: str,
-            extension: tuple | str = None,
+            extension: "tuple | str" = None,
             names: list = None,
             exceptions_files: list = None,
             exceptions_dirs: list = None,
