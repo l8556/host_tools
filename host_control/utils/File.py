@@ -205,7 +205,7 @@ class File:
     @staticmethod
     def get_paths(
             path: str,
-            extension: tuple | str = None,
+            extension: "tuple | str" = None,
             names: list = None,
             exceptions_files: list = None,
             exceptions_dirs: list = None,

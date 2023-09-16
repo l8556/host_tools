@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from shutil import rmtree
 from os import makedirs, scandir, walk
-from os.path import exists, isdir, join
+from os.path import isdir, join
 from rich import print
 
 
