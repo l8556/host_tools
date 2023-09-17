@@ -24,7 +24,7 @@ python-xlib = "*"
 py7zr = "^0.20.6"
 pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
 distro = "*"
-requests = "^2.31.0"
+requests = "*"
 rich = "*"
 
 
