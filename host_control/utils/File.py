@@ -145,7 +145,7 @@ class File:
 
     @staticmethod
     def make_tmp(file_path: str, tmp_dir: str = gettempdir()) -> str:
-        Dir.create(tmp_dir) if not exists(tmp_dir) else ...
+        Dir.create(tmp_dir, stdout=False) if not isdir(tmp_dir) else ...
         tmp_file_path = File.unique_name(tmp_dir, file_path.split(".")[-1])
         if exists(file_path):
             File.copy(file_path, tmp_file_path, stdout=False)
