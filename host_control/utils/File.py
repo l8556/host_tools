@@ -63,15 +63,18 @@ class File:
         Shell.run(f'chmod {mode} {join(Str.delete_last_slash(dir_path))}/*')
 
     @staticmethod
-    def delete(path: "str | tuple", stdout: bool = True, stderr: bool = True) -> None:
-        for _path in path if isinstance(path, tuple) else [path]:
+    def delete(path: "str | tuple | list", stdout: bool = True, stderr: bool = True) -> None:
+        if not path:
+            return print(f"[red]|DELETE ERROR| Path should be string, tuple or list not {path}") if stderr else None
+
+        for _path in [path] if isinstance(path, str) else path:
             object_path = _path.rstrip("*")
             if not exists(object_path):
                 print(f"[bold red]|DELETE WARNING| File not exist: {object_path}") if stderr else ...
                 continue
 
             if isdir(object_path):
-                Dir.delete(object_path, create_dir=_path.endswith("*"), stdout=stdout, stderr=stderr)
+                Dir.delete(object_path, clear_dir=_path.endswith("*"), stdout=stdout, stderr=stderr)
             else:
                 remove(object_path)
 
@@ -100,11 +103,13 @@ class File:
                 for file in track(File.get_paths(path), description=f"[green]|INFO| Compressing dir: {_name}"):
                     if basename(file) not in exceptions:
                         _zip.write(file, relpath(file, path), compress_type=ZIP_DEFLATED)
-                        File.delete(file) if delete else ...
+                if delete:
+                    _archive_name = basename(_archive_path)
+                    File.delete([join(path, obj) for obj in listdir(path) if obj != _archive_name], stdout=False)
             else:
                 print(f'[green]|INFO| Compressing file: {path}')
                 _zip.write(path, _name, compress_type=ZIP_DEFLATED)
-                File.delete(path) if delete else ...
+                File.delete(path, stdout=False) if delete else ...
 
         if exists(_archive_path) and getsize(_archive_path) != 0:
             return print(f"[green]|INFO| Success compressed: {_archive_path}")
@@ -145,7 +150,7 @@ class File:
 
     @staticmethod
     def make_tmp(file_path: str, tmp_dir: str = gettempdir()) -> str:
-        Dir.create(tmp_dir) if not exists(tmp_dir) else ...
+        Dir.create(tmp_dir, stdout=False) if not isdir(tmp_dir) else ...
         tmp_file_path = File.unique_name(tmp_dir, file_path.split(".")[-1])
         if exists(file_path):
             File.copy(file_path, tmp_file_path, stdout=False)

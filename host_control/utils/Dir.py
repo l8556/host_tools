@@ -5,8 +5,8 @@ from os.path import isdir, join
 from rich import print
 
 
-def create(dir_path: "str | tuple", stdout: bool = True, stderr: bool = True) -> None:
-    for _dir_path in dir_path if isinstance(dir_path, tuple) else [dir_path]:
+def create(dir_path: "str | tuple | list", stdout: bool = True, stderr: bool = True) -> None:
+    for _dir_path in [dir_path] if isinstance(dir_path, str) else dir_path:
         if not isdir(_dir_path):
             makedirs(_dir_path)
 
@@ -35,15 +35,15 @@ def get_paths(path: str, end_dir: str = None, dir_include: str = None) -> list:
     return dir_paths
 
 
-def delete(path: "str | tuple", create_dir: bool = False, stdout: bool = True, stderr: bool = True) -> None:
-    for _path in path if isinstance(path, tuple) else [path]:
+def delete(path: "str | tuple | list", clear_dir: bool = False, stdout: bool = True, stderr: bool = True) -> None:
+    for _path in [path] if isinstance(path, str) else path:
         if not isdir(_path):
             print(f"[bold red]|DELETE WARNING| Directory not exist: {_path}") if stderr else ...
             continue
 
         rmtree(_path, ignore_errors=True)
 
-        if create_dir:
+        if clear_dir:
             create(_path, stdout=False)
             if stderr and any(scandir(_path)):
                 return print(f"[bold red]|DELETE WARNING| Not all files are removed from directory: {path}")

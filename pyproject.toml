@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "host-control"
-version = "1.01"
+version = "1.02"
 description = ""
 authors = ["l02 <l8556@outlook.com>"]
 readme = "README.md"
