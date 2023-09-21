@@ -67,7 +67,7 @@ class File:
         if not path:
             return print(f"[red]|DELETE ERROR| Path should be string, tuple or list not {path}") if stderr else None
 
-        for _path in path if isinstance(path, tuple) or isinstance(path, list) else [path]:
+        for _path in [path] if isinstance(path, str) else path:
             object_path = _path.rstrip("*")
             if not exists(object_path):
                 print(f"[bold red]|DELETE WARNING| File not exist: {object_path}") if stderr else ...
