@@ -35,7 +35,7 @@ def get_paths(path: str, end_dir: str = None, dir_include: str = None) -> list:
     return dir_paths
 
 
-def delete(path: "str | tuple", create_dir: bool = False, stdout: bool = True, stderr: bool = True) -> None:
+def delete(path: "str | tuple", clear_dir: bool = False, stdout: bool = True, stderr: bool = True) -> None:
     for _path in path if isinstance(path, tuple) else [path]:
         if not isdir(_path):
             print(f"[bold red]|DELETE WARNING| Directory not exist: {_path}") if stderr else ...
@@ -43,7 +43,7 @@ def delete(path: "str | tuple", create_dir: bool = False, stdout: bool = True, s
 
         rmtree(_path, ignore_errors=True)
 
-        if create_dir:
+        if clear_dir:
             create(_path, stdout=False)
             if stderr and any(scandir(_path)):
                 return print(f"[bold red]|DELETE WARNING| Not all files are removed from directory: {path}")

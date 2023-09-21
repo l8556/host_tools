@@ -74,7 +74,7 @@ class File:
                 continue
 
             if isdir(object_path):
-                Dir.delete(object_path, create_dir=_path.endswith("*"), stdout=stdout, stderr=stderr)
+                Dir.delete(object_path, clear_dir=_path.endswith("*"), stdout=stdout, stderr=stderr)
             else:
                 remove(object_path)
 
