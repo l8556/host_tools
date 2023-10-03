@@ -121,11 +121,10 @@ class File:
             return json.load(file)
 
     @staticmethod
-    def write_json(path: str, data: str, mode: str = 'w') -> None:
-        if not exists(path):
-            return print(f"[red]|WARNING| The path to json file_name does not exist: {path}")
+    def write_json(path: str, data: "dict | list", mode: str = 'w', indent: int = 2) -> None:
+        Dir.create(dirname(path))
         with open(path, mode) as file:
-            json.dump(data, file, indent=2)
+            json.dump(data, file, indent=indent)
 
     @staticmethod
     def unpacking(archive_path: str, execute_path: str, delete_archive: bool = False) -> None:
