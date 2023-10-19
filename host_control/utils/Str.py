@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re
+from re import search as re_search
 import string
 from random import choice
 
@@ -17,6 +17,8 @@ def find_by_key(text: str, key: str, split_by: str = '\n', separator: str = ':')
             if _key.lower() == key.lower():
                 return value.strip()
 
-def search(text: str, pattern: str, group_num: int = 1) -> 'str | None':
-    match = re.search(pattern, text)
-    return match.group(group_num) if match else None
+def search(text: str, pattern: str, group_num: int = 0) -> 'str | None':
+    try:
+        return re_search(pattern, text).group(group_num)
+    except (IndexError, AttributeError):
+        return None
