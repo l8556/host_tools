@@ -5,7 +5,7 @@ from codecs import open as codecs_open
 from io import open as io_open
 from host_control.utils import Dir, Shell, Str
 from random import randint
-from shutil import move, copytree, copyfile
+from shutil import move, copyfile
 from os import remove, walk, listdir, scandir
 from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath, dirname
 from tempfile import gettempdir
@@ -170,12 +170,18 @@ class File:
         return max(files, key=getctime) if files else print('[bold red]|WARNING| Last modified file_name not found')
 
     @staticmethod
-    def copy(path_from: str, path_to: str, stdout: bool = True, stderr: bool = True) -> None:
+    def copy(
+            path_from: str,
+            path_to: str,
+            stdout: bool = True,
+            stderr: bool = True,
+            dir_overwrite: bool = False
+    ) -> None:
         if not exists(path_from):
             return print(f"[bold red]|COPY WARNING| Path from not exist: {path_from}")
 
         if isdir(path_from):
-            copytree(path_from, path_to)
+            Dir.copy(path_from, path_to, stdout=stdout, stderr=stderr, overwrite=dir_overwrite)
         elif isfile(path_from):
             copyfile(path_from, path_to)
         else:

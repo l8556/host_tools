@@ -1,9 +1,27 @@
 # -*- coding: utf-8 -*-
-from shutil import rmtree
+from shutil import rmtree, copytree
 from os import makedirs, scandir, walk
 from os.path import isdir, join
 from rich import print
 
+
+def copy(path_from: str, path_to: str, stdout: bool = True, stderr: bool = True, overwrite: bool = False) -> None:
+    if not isdir(path_from):
+        return print(f"[bold red]|COPY WARNING| Path from not is folder: {path_from}")
+
+    _path_to = path_to
+
+    if not overwrite:
+        num = 0
+        while isdir(_path_to):
+            _path_to = path_to + f"({num})"
+            num += 1
+
+    copytree(path_from, _path_to, dirs_exist_ok=overwrite)
+
+    if isdir(path_to):
+        return print(f'[green]|INFO| Copied to: {path_to}') if stdout else None
+    return print(f'[bold red]|COPY WARNING| Dir not copied: {path_to}') if stderr else None
 
 def create(dir_path: "str | tuple | list", stdout: bool = True, stderr: bool = True) -> None:
     for _dir_path in [dir_path] if isinstance(dir_path, str) else dir_path:
