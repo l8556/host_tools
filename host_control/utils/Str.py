@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import string
 from random import choice
 
@@ -15,3 +16,7 @@ def find_by_key(text: str, key: str, split_by: str = '\n', separator: str = ':')
             _key, value = line.strip().split(separator, 1)
             if _key.lower() == key.lower():
                 return value.strip()
+
+def search(text: str, pattern: str, group_num: int = 1) -> 'str | None':
+    match = re.search(pattern, text)
+    return match.group(group_num) if match else None
