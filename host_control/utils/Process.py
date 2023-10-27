@@ -13,9 +13,9 @@ def terminate(names: list) -> None:
                 except Exception as e:
                     print(f'[bold red]|Warning| Exception when terminate process {terminateProcess}: {e}')
 
-
-def get_name(process):
+def get_name(process: psutil.Process) -> str:
     try:
         return process.name()
-    except psutil.NoSuchProcess as e:
-        print(f"[bold red]|ERROR| Process name not found: {e}")
+    except (psutil.NoSuchProcess, TypeError) as e:
+        print(f"[bold red]|ERROR| Error while retrieving process name: {e}")
+        return ''
