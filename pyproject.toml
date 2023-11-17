@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "host-control"
+name = "host-tools"
 version = "1.03"
 description = ""
 authors = ["l02 <l8556@outlook.com>"]
