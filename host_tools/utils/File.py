@@ -3,7 +3,7 @@ import json
 
 from codecs import open as codecs_open
 from io import open as io_open
-from host_control.utils import Dir, Shell, Str
+from host_tools.utils import Dir, Shell, Str
 from random import randint
 from shutil import move, copyfile
 from os import remove, walk, listdir, scandir
