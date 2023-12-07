@@ -220,7 +220,8 @@ class File:
             exceptions_files: list = None,
             exceptions_dirs: list = None,
             dir_include: str = None,
-            name_include: str = None
+            name_include: str = None,
+            name_starts_with: str = None
     ) -> list:
         ext_dirs = [join(path, ext_path) for ext_path in exceptions_dirs] if exceptions_dirs else []
 
@@ -228,13 +229,13 @@ class File:
 
         for root, dirs, files in walk(path):
             for filename in files:
-                if exceptions_files and filename in exceptions_files:
-                    continue
-                if exceptions_dirs and [path for path in ext_dirs if path in root]:
-                    continue
-                if dir_include and (dir_include not in basename(root)):
-                    continue
-                if name_include and (name_include not in filename):
+                if (
+                    exceptions_files and filename in exceptions_files
+                    or exceptions_dirs and [path for path in ext_dirs if path in root]
+                    or dir_include and (dir_include not in basename(root))
+                    or name_include and (name_include not in filename)
+                    or name_starts_with and not filename.startswith(name_starts_with)
+                ):
                     continue
                 if names:
                     file_paths.append(join(root, filename)) if filename in names else ...
