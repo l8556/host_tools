@@ -64,5 +64,7 @@ def delete(path: "str | tuple | list", clear_dir: bool = False, stdout: bool = T
         if clear_dir:
             create(_path, stdout=False)
             if stderr and any(scandir(_path)):
-                return print(f"[bold red]|DELETE WARNING| Not all files are removed from directory: {path}")
-            print(f'[green]|INFO| Deleted: {_path}') if stdout else ...
+                print(f"[bold red]|DELETE WARNING| Not all files are removed from directory: {path}")
+                continue
+
+        print(f'[green]|INFO| Deleted: {_path}') if stdout and not isdir(_path) else ...

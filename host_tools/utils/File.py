@@ -3,7 +3,7 @@ import json
 
 from codecs import open as codecs_open
 from io import open as io_open
-from host_control.utils import Dir, Shell, Str
+from host_tools.utils import Dir, Shell, Str
 from random import randint
 from shutil import move, copyfile
 from os import remove, walk, listdir, scandir
@@ -11,7 +11,7 @@ from os.path import exists, isfile, isdir, join, getctime, basename, getsize, re
 from tempfile import gettempdir
 from platform import system
 from requests import get, head
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile
 from py7zr import SevenZipFile
 from rich import print
 from rich.progress import track
@@ -84,8 +84,9 @@ class File:
             print(f'[green]|INFO| Deleted: {_path}') if stdout else ...
 
     @staticmethod
-    def compress(path: str, archive_path: str = None, delete: bool = False) -> None:
+    def compress(path: str, archive_path: str = None, delete: bool = False, compress_type: int = 8) -> None:
         """
+        :param compress_type: ZIP_STORED = 0, ZIP_DEFLATED = 8, ZIP_BZIP2 = 12, ZIP_LZMA = 14
         :param path: Path to compression files.
         :param archive_path: Path to the archive file.
         :param delete:  Deleting files after compression.
@@ -102,13 +103,13 @@ class File:
                 exceptions = File.EXCEPTIONS + [f"{basename(_archive_path)}"]
                 for file in track(File.get_paths(path), description=f"[green]|INFO| Compressing dir: {_name}"):
                     if basename(file) not in exceptions:
-                        _zip.write(file, relpath(file, path), compress_type=ZIP_DEFLATED)
+                        _zip.write(file, relpath(file, path), compress_type=compress_type)
                 if delete:
                     _archive_name = basename(_archive_path)
                     File.delete([join(path, obj) for obj in listdir(path) if obj != _archive_name], stdout=False)
             else:
                 print(f'[green]|INFO| Compressing file: {path}')
-                _zip.write(path, _name, compress_type=ZIP_DEFLATED)
+                _zip.write(path, _name, compress_type=compress_type)
                 File.delete(path, stdout=False) if delete else ...
 
         if exists(_archive_path) and getsize(_archive_path) != 0:
