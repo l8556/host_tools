@@ -57,11 +57,10 @@ class File:
             text: str,
             mode: str = 'w',
             newline: str = None,
-            buffering: int = None,
             encoding: str = None,
             errors: str = None
     ) -> None:
-        with open(file_path, mode, newline=newline, buffering=buffering, encoding=encoding, errors=errors) as file:
+        with open(file_path, mode, newline=newline, encoding=encoding, errors=errors) as file:
             file.write(text)
 
     @staticmethod
