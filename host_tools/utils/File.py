@@ -52,8 +52,16 @@ class File:
             return file.read()
 
     @staticmethod
-    def write(file_path: str, text: str, mode: str = 'w') -> None:
-        with open(file_path, mode) as file:
+    def write(
+            file_path: str,
+            text: str,
+            mode: str = 'w',
+            newline: str = None,
+            buffering: int = None,
+            encoding: str = None,
+            errors: str = None
+    ) -> None:
+        with open(file_path, mode, newline=newline, buffering=buffering, encoding=encoding, errors=errors) as file:
             file.write(text)
 
     @staticmethod
