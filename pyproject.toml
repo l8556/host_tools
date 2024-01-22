@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "host-tools"
-version = "2.00"
+version = "2.02"
 description = ""
 authors = ["l02 <l8556@outlook.com>"]
 readme = "README.md"
