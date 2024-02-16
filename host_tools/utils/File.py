@@ -29,7 +29,26 @@ class File:
         return False
 
     @staticmethod
-    def download(url: str, dir_path: str, name: str = None) -> None:
+    def download(
+            url: str,
+            dir_path: str,
+            name: str = None,
+            process_bar: bool = True,
+            stdout: bool = True,
+            stderr: bool = True,
+            chunk_size: int = 1024 * 1024
+    ) -> None:
+        """
+        :param chunk_size:
+        :param url: download link
+        :param dir_path: download folder
+        :param name: download filename
+        :param process_bar: Enables/disables the file upload status bar display,
+        only 1 status bar can be displayed at a time.
+        :param stdout: Enable/disable display of successful download messages
+        :param stderr: Enable/disable display of error messages
+        """
+
         Dir.create(dir_path, stdout=False)
 
         _name = name if name else basename(url)
@@ -38,12 +57,15 @@ class File:
         with get(url, stream=True) as r:
             r.raise_for_status()
             with open(_path, 'wb') as file:
-                for chunk in track(r.iter_content(chunk_size=1024 * 1024), description=f'[red] Downloading: {_name}'):
+                _iter = r.iter_content(chunk_size=chunk_size)
+                for chunk in track(_iter, description=f'[red] Downloading: {_name}') if process_bar else _iter:
                     if chunk:
                         file.write(chunk)
-        print(f"[bold green]|INFO| File Saved to: {_path}" if isfile(_path) else f"[red]|WARNING| Not exist")
 
-        if int(getsize(_path)) != int(r.headers['Content-Length']):
+        if stdout:
+            print(f"[bold green]|INFO| File Saved to: {_path}" if isfile(_path) else f"[red]|WARNING| Not exist")
+
+        if stderr and int(getsize(_path)) != int(r.headers['Content-Length']):
             print(f"[red]|WARNING| Size different\nFile:{getsize(_path)}\nOn server:{r.headers['Content-Length']}")
 
     @staticmethod
