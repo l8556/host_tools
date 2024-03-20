@@ -42,7 +42,7 @@ class Unix(Service):
     @staticmethod
     def _manage_service(action: str, service_name: str) -> None:
         try:
-            result = Unix._execute_command(['sudo', 'systemctl', action, service_name])
+            result = Unix._execute_command(['systemctl', action, service_name])
             print(result.stderr.strip()) if result.stderr else ...
             print(result.stdout.strip()) if result.stdout else ...
             print(f"[green]|INFO| Service '{service_name}' {action}ed successfully.")
