@@ -35,7 +35,7 @@ class Windows(Service):
     def _execute_operation(service_name: str, operation: str, action_func):
         try:
             action_func(service_name)
-            print(f"Service '{service_name}' {operation} successfully.")
+            print(f"[green]|INFO| Service '{service_name}' {operation} successfully.")
         except Exception as e:
             Windows._handle_error(service_name, operation, e)
 
