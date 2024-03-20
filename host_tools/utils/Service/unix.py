@@ -16,11 +16,11 @@ class Unix(Service):
                 service_info = line.split(None, 4)
                 if len(service_info) == 5:
                     services.append({
-                        'unit': service_info[0],
-                        'load': service_info[1],
-                        'active': service_info[2],
-                        'sub': service_info[3],
-                        'description': service_info[4]
+                        'unit': service_info[0].decode(),
+                        'load': service_info[1].decode(),
+                        'active': service_info[2].decode(),
+                        'sub': service_info[3].decode(),
+                        'description': service_info[4].decode()
                     })
             return services
         except CalledProcessError as e:
