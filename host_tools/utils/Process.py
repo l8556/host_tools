@@ -36,8 +36,7 @@ def get_all() -> list[dict]:
 
     for proc in psutil.process_iter():
         try:
-            process_info = proc.as_dict(attrs=['pid', 'name', 'username'])
-            processes.append(process_info)
+            processes.append(proc.as_dict(attrs=['pid', 'name', 'username']))
         except psutil.NoSuchProcess:
             pass
 
