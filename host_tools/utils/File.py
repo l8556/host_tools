@@ -24,16 +24,20 @@ class File:
     @staticmethod
     def get_sha256(file_path: str, block_size=65536) -> str:
         sha256 = hashlib.sha256()
+
         with open(file_path, 'rb') as file:
             for block in iter(lambda: file.read(block_size), b''):
                 sha256.update(block)
+
         return sha256.hexdigest()
 
     @staticmethod
     def get_headers(url: str):
         status = head(url)
+
         if status.status_code == 200:
             return status.headers
+
         print(f"[bold red]|WARNING| Can't get headers\nURL:{url}\nResponse: {status.status_code}")
         return False
 

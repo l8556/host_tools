@@ -42,13 +42,9 @@ class Unix(Service):
     @staticmethod
     def _manage_service(action: str, service_name: str) -> None:
         try:
-            result = Unix._execute_command(['systemctl', action, service_name])
+            result = run(['systemctl', action, service_name], check=True, stdout=PIPE, stderr=PIPE, text=True)
             print(result.stderr.strip()) if result.stderr else ...
             print(result.stdout.strip()) if result.stdout else ...
             print(f"[green]|INFO| Service '{service_name}' {action}ed successfully.")
         except CalledProcessError as e:
             print(f"[red]|ERROR| Failed to {action} service '{service_name}': {e}")
-
-    @staticmethod
-    def _execute_command(command: list[str]) -> CompletedProcess[str]:
-        return run(command, check=True, stdout=PIPE, stderr=PIPE, text=True)
