@@ -19,3 +19,25 @@ def get_name(process: psutil.Process) -> str:
     except (psutil.NoSuchProcess, TypeError) as e:
         print(f"[bold red]|ERROR| Error while retrieving process name: {e}")
         return ''
+
+def get_running() -> list[dict]:
+    running_processes = []
+
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            running_processes.append({"id": proc.info['pid'], "name": proc.info['name']})
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
+    return running_processes
+
+def get_all() -> list[dict]:
+    processes = []
+
+    for proc in psutil.process_iter():
+        try:
+            processes.append(proc.as_dict(attrs=['pid', 'name', 'username']))
+        except psutil.NoSuchProcess:
+            pass
+
+    return processes
