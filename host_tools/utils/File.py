@@ -101,7 +101,7 @@ class File:
     @staticmethod
     def change_access(dir_path: str, mode: str = '+x') -> None:
         if system().lower() == 'windows':
-            return print("[bold red]|WARNING| Can't change access on windows")
+            return
         Shell.run(f'chmod {mode} {join(Str.delete_last_slash(dir_path))}/*')
 
     @staticmethod
