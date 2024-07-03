@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import psutil
-from psutil import process_iter
 from rich import print
 
+def terminate(names: "list | str") -> None:
+    names = {names.lower()} if isinstance(names, str) else {name.lower() for name in names}
 
-def terminate(names: list) -> None:
-    for process in process_iter():
-        for terminateProcess in names:
-            if terminateProcess in get_name(process):
-                try:
-                    process.terminate()
-                except Exception as e:
-                    print(f'[bold red]|Warning| Exception when terminate process {terminateProcess}: {e}')
+    for process in psutil.process_iter():
+        if get_name(process) in names:
+            try:
+                process.kill()
+            except psutil.NoSuchProcess:
+                print(f"[bold red]|ERROR| Exception when terminating process {process.name()}")
 
 def get_name(process: psutil.Process) -> str:
     try:
@@ -23,9 +22,14 @@ def get_name(process: psutil.Process) -> str:
 def get_running() -> list[dict]:
     running_processes = []
 
-    for proc in psutil.process_iter(['pid', 'name']):
+    for proc in psutil.process_iter():
         try:
-            running_processes.append({"id": proc.info['pid'], "name": proc.info['name']})
+            if proc.status().lower() == 'running':
+                running_processes.append({
+                    "pid": proc.pid,
+                    "name": proc.name(),
+                    "create_time": proc.create_time()
+                })
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
 
@@ -41,3 +45,8 @@ def get_all() -> list[dict]:
             pass
 
     return processes
+
+def get_info(process_name: str) -> dict:
+    for process in psutil.process_iter():
+        if get_name(process) == process_name:
+            return process.as_dict()
