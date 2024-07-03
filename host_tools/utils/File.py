@@ -4,6 +4,10 @@ import hashlib
 
 from codecs import open as codecs_open
 from io import open as io_open
+from typing import Optional
+
+from requests.structures import CaseInsensitiveDict
+
 from host_tools.utils import Dir, Shell, Str
 from random import randint
 from shutil import move, copyfile
@@ -39,7 +43,7 @@ class File:
         return sha256.hexdigest()
 
     @staticmethod
-    def get_headers(url: str, stderr: bool = False) -> "dict | None":
+    def get_headers(url: str, stderr: bool = False) -> Optional[CaseInsensitiveDict[str]]:
         """
         Retrieve headers from a given URL.
 
@@ -81,10 +85,10 @@ class File:
         _name = name if name else basename(url)
         _path = join(dir_path, _name)
 
-        with get(url, stream=True) as r:
-            r.raise_for_status()
+        with get(url, stream=True) as request:
+            request.raise_for_status()
             with open(_path, 'wb') as file:
-                _iter = r.iter_content(chunk_size=chunk_size)
+                _iter = request.iter_content(chunk_size=chunk_size)
                 for chunk in track(_iter, description=f'[red] Downloading: {_name}') if process_bar else _iter:
                     if chunk:
                         file.write(chunk)
@@ -92,8 +96,8 @@ class File:
         if stdout:
             print(f"[bold green]|INFO| File Saved to: {_path}" if isfile(_path) else f"[red]|WARNING| Not exist")
 
-        if stderr and int(getsize(_path)) != int(r.headers['Content-Length']):
-            print(f"[red]|WARNING| Size different\nFile:{getsize(_path)}\nOn server:{r.headers['Content-Length']}")
+        if stderr and int(getsize(_path)) != int(request.headers['Content-Length']):
+            print(f"[red]|WARNING| Size different\nFile:{getsize(_path)}\nServer:{request.headers['Content-Length']}")
 
     @staticmethod
     def read(file_path: str, mode: str = 'r', encoding='utf-8') -> str:
@@ -129,10 +133,18 @@ class File:
             file.write(text)
 
     @staticmethod
-    def change_access(dir_path: str, mode: str = '+x') -> None:
+    def change_access(path: str, mode: str = '+x') -> None:
+        """
+        Only for Unix.
+        """
         if system().lower() == 'windows':
             return
-        Shell.run(f'chmod {mode} {join(Str.delete_last_slash(dir_path))}/*')
+
+        if isdir(path):
+            path = f'{Str.delete_last_slash(path)}/*'
+
+        Shell.run(f'chmod {mode} {path}')
+
 
     @staticmethod
     def delete(path: "str | tuple | list", stdout: bool = True, stderr: bool = True) -> None:
@@ -156,37 +168,55 @@ class File:
                 print(f'[green]|INFO| Deleted: {_path}') if stdout else ...
 
     @staticmethod
-    def compress(path: str, archive_path: str = None, delete: bool = False, compress_type: int = 8) -> None:
+    def compress(
+            path: str,
+            archive_path: str = None,
+            delete: bool = False,
+            compress_type: int = 8,
+            stdout: bool = False,
+            stderr: bool = True,
+            progress_bar: bool = True
+    ) -> None:
         """
+        :param stdout:
+        :param stderr:
+        :param progress_bar:
         :param compress_type: ZIP_STORED = 0, ZIP_DEFLATED = 8, ZIP_BZIP2 = 12, ZIP_LZMA = 14
         :param path: Path to compression files.
         :param archive_path: Path to the archive file.
         :param delete:  Deleting files after compression.
         """
         _name = basename(Str.delete_last_slash(path))
-        _archive_path = archive_path if archive_path else join(dirname(path) if isfile(path) else path, f"{_name}.zip")
+        _archive_path = archive_path or join(dirname(path) if isfile(path) else path, f"{_name}.zip")
 
         if not exists(path):
-            return print(f'[bold red]|COMPRESS WARNING| Path for compression does not exist: {path}')
+            return print(f'[red]|COMPRESS WARNING| Path for compression does not exist: {path}') if stderr else None
 
         Dir.create(dirname(_archive_path), stdout=False)
+
         with ZipFile(_archive_path, 'w') as _zip:
             if isdir(path):
-                exceptions = File.EXCEPTIONS + [f"{basename(_archive_path)}"]
-                for file in track(File.get_paths(path), description=f"[green]|INFO| Compressing dir: {_name}"):
-                    if basename(file) not in exceptions:
-                        _zip.write(file, relpath(file, path), compress_type=compress_type)
-                if delete:
-                    _archive_name = basename(_archive_path)
-                    File.delete([join(path, obj) for obj in listdir(path) if obj != _archive_name], stdout=False)
-            else:
-                print(f'[green]|INFO| Compressing file: {path}')
-                _zip.write(path, _name, compress_type=compress_type)
-                File.delete(path, stdout=False) if delete else ...
+                print(f'[green]|INFO| Compressing dir: {path}') if stdout else None
 
-        if exists(_archive_path) and getsize(_archive_path) != 0:
-            return print(f"[green]|INFO| Success compressed: {_archive_path}")
-        print(f"[WARNING] Archive not exists: {_archive_path}")
+                files = File.get_paths(path, exceptions_files=File.EXCEPTIONS + [f"{basename(_archive_path)}"])
+                _iter = track(files, description=f"[green]|INFO| Compressing dir: {_name}") if progress_bar else files
+
+                for file in _iter:
+                    _zip.write(file, relpath(file, path), compress_type=compress_type)
+
+                if delete:
+                    File.delete(files, stdout=False)
+
+            else:
+                print(f'[green]|INFO| Compressing file: {path}') if stdout else None
+                _zip.write(path, _name, compress_type=compress_type)
+                File.delete(path, stdout=False) if delete else None
+
+        if stderr and not exists(_archive_path) or getsize(_archive_path) == 0:
+            return print(f"[ERROR] Archive not exists: {_archive_path}")
+
+        print(f"[green]|INFO| Success compressed: {_archive_path}") if stdout else None
+
 
     @staticmethod
     def read_json(path_to_json: str, encoding: str = "utf_8_sig") -> json:
@@ -327,6 +357,7 @@ class File:
             names: list = None,
             exceptions_files: list = None,
             exceptions_dirs: list = None,
+            path_include: str = None,
             dir_include: str = None,
             name_include: str = None,
             name_starts_with: str = None
@@ -338,15 +369,17 @@ class File:
         :param extension: (Optional) The extension(s) of the files to include. Can be a string or a tuple of strings. Defaults to None.
         :param names: (Optional) A list of specific filenames to include. Defaults to None.
         :param exceptions_files: (Optional) A list of filenames to exclude from the results. Defaults to None.
-        :param exceptions_dirs: (Optional) A list of directory paths to exclude from the search. Defaults to None.
+        :param exceptions_dirs: (Optional) A list of directory names to exclude from the search. Defaults to None.
+        :param path_include: (Optional) Include only files containing this substring in the directory path. Default is set to No.
         :param dir_include: (Optional) Only include directories containing this substring in their name. Defaults to None.
         :param name_include: (Optional) Only include files containing this substring in their name. Defaults to None.
         :param name_starts_with: (Optional) Only include files whose names start with this substring. Defaults to None.
 
         :return: A list of file paths matching the specified criteria.
         """
+
         if exceptions_dirs:
-            exceptions_dirs = {join(path, ext_path) for ext_path in (exceptions_dirs or set())}
+            exceptions_dirs = {join(path, dir_name) for dir_name in (exceptions_dirs or set())}
 
         if extension:
             extension = tuple(ext.lower() for ext in extension) if isinstance(extension, tuple) else extension.lower()
@@ -358,6 +391,9 @@ class File:
                 continue
 
             if dir_include and dir_include not in basename(root):
+                continue
+
+            if path_include and path_include not in root:
                 continue
 
             for filename in files:
