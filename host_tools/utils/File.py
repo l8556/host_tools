@@ -205,7 +205,8 @@ class File:
                     _zip.write(file, relpath(file, path), compress_type=compress_type)
 
                 if delete:
-                    File.delete(files, stdout=False)
+                    _archive_name = basename(_archive_path)
+                    File.delete([join(path, obj) for obj in listdir(path) if obj != _archive_name], stdout=False)
 
             else:
                 print(f'[green]|INFO| Compressing file: {path}') if stdout else None
