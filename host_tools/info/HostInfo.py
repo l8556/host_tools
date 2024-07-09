@@ -21,8 +21,8 @@ class HostInfo:
                 print(f"[bold red]|ERROR| Error defining os: {self.__os}")
                 self.__os = ''
 
-            elif self.__os == 'darwin':
-                self.__os == 'mac'
+            if self.__os == 'darwin':
+                self.__os = 'mac'
 
         return self.__os
 
@@ -45,5 +45,3 @@ class HostInfo:
             else:
                 self.__version = Unix().version
         return self.__version
-
-
