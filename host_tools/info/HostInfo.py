@@ -16,9 +16,14 @@ class HostInfo:
     def os(self) -> str:
         if self.__os is None:
             self.__os = system().lower()
+
             if self.__os not in ['linux', 'darwin', 'windows']:
                 print(f"[bold red]|ERROR| Error defining os: {self.__os}")
                 self.__os = ''
+
+            if self.__os == 'darwin':
+                self.__os = 'mac'
+
         return self.__os
 
     @property
