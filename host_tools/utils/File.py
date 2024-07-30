@@ -265,7 +265,7 @@ class File:
             archive.extractall(execute_path)
 
         print(f'[green]|INFO| Unpack Completed to: {execute_path}') if stdout else None
-        File.delete(archive_path) if delete_archive else ...
+        File.delete(archive_path, stdout=stdout) if delete_archive else ...
 
     @staticmethod
     def make_tmp(file_path: str, tmp_dir: str = gettempdir()) -> str:
