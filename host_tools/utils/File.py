@@ -11,7 +11,7 @@ from requests.structures import CaseInsensitiveDict
 from host_tools.utils import Dir, Shell, Str
 from random import randint
 from shutil import move, copyfile
-from os import remove, walk, listdir, scandir
+from os import remove, walk, listdir, scandir, chmod
 from os.path import exists, isfile, isdir, join, getctime, basename, getsize, relpath, dirname
 from tempfile import gettempdir
 from platform import system
@@ -147,7 +147,20 @@ class File:
 
 
     @staticmethod
-    def delete(path: "str | tuple | list", stdout: bool = True, stderr: bool = True) -> None:
+    def delete(
+            path: "str | tuple | list",
+            stdout: bool = True,
+            stderr: bool = True,
+            full_access: bool = False
+    ) -> None:
+        """
+        Delete files or directories with optional full access permission.
+
+        :param path: A single path as a string, or multiple paths as a tuple or list.
+        :param stdout: Whether to print informational messages to stdout. Defaults to True.
+        :param stderr: Whether to print error messages to stderr. Defaults to True.
+        :param full_access: If True, sets full access permissions (0o777) before deletion. Defaults to False.
+        """
         if not path:
             return print(f"[red]|DELETE ERROR| Path should be string, tuple or list not {path}") if stderr else None
 
@@ -156,6 +169,8 @@ class File:
             if not exists(object_path):
                 print(f"[bold red]|DELETE WARNING| File not exist: {object_path}") if stderr else ...
                 continue
+
+            chmod(path, 0o777) if full_access else None
 
             if isdir(object_path):
                 Dir.delete(object_path, clear_dir=_path.endswith("*"), stdout=stdout, stderr=stderr)
