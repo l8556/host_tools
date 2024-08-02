@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from shutil import rmtree, copytree
-from os import makedirs, scandir, walk
+from os import makedirs, scandir, walk, chmod
 from os.path import isdir, join
 from rich import print
 
@@ -53,12 +53,29 @@ def get_paths(path: str, end_dir: str = None, dir_include: str = None) -> list:
     return dir_paths
 
 
-def delete(path: "str | tuple | list", clear_dir: bool = False, stdout: bool = True, stderr: bool = True) -> None:
+def delete(
+        path: "str | tuple | list",
+        clear_dir: bool = False,
+        stdout: bool = True,
+        stderr: bool = True,
+        full_access: bool = False
+) -> None:
+    """
+    Delete files or directories specified by the path(s). Optionally clear directory contents and change permissions before deletion.
+
+    :param path: A single path, tuple of paths, or list of paths to delete.
+    :param clear_dir: If True, re-create directories after deletion to ensure they are empty. Defaults to False.
+    :param stdout: If True, print information messages to standard output. Defaults to True.
+    :param stderr: If True, print warning messages to standard error. Defaults to True.
+    :param full_access: If True, change the permissions of the path(s) before deletion
+    on 0o777(full access). Defaults to False.
+    """
     for _path in [path] if isinstance(path, str) else path:
         if not isdir(_path):
             print(f"[bold red]|DELETE WARNING| Directory not exist: {_path}") if stderr else ...
             continue
 
+        chmod(path, 0o777) if full_access else None
         rmtree(_path, ignore_errors=True)
 
         if clear_dir:
