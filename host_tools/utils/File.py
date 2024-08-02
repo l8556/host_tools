@@ -147,7 +147,20 @@ class File:
 
 
     @staticmethod
-    def delete(path: "str | tuple | list", stdout: bool = True, stderr: bool = True, full_access: bool = True) -> None:
+    def delete(
+            path: "str | tuple | list",
+            stdout: bool = True,
+            stderr: bool = True,
+            full_access: bool = False
+    ) -> None:
+        """
+        Delete files or directories with optional full access permission.
+
+        :param path: A single path as a string, or multiple paths as a tuple or list.
+        :param stdout: Whether to print informational messages to stdout. Defaults to True.
+        :param stderr: Whether to print error messages to stderr. Defaults to True.
+        :param full_access: If True, sets full access permissions (0o777) before deletion. Defaults to False.
+        """
         if not path:
             return print(f"[red]|DELETE ERROR| Path should be string, tuple or list not {path}") if stderr else None
 

@@ -67,7 +67,7 @@ def delete(
     :param clear_dir: If True, re-create directories after deletion to ensure they are empty. Defaults to False.
     :param stdout: If True, print information messages to standard output. Defaults to True.
     :param stderr: If True, print warning messages to standard error. Defaults to True.
-    :param full_access: If True, change the permissions of the path(s) before deletion
+    :param full_access: If True, sets full access permissions (0o777) before deletion. Defaults to False.
     on 0o777(full access). Defaults to False.
     """
     for _path in [path] if isinstance(path, str) else path:
