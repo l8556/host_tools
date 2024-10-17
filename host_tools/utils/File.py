@@ -240,10 +240,17 @@ class File:
             return json.load(file)
 
     @staticmethod
-    def write_json(path: str, data: "dict | list", mode: str = 'w', indent: int = 2) -> None:
-        Dir.create(dirname(path))
-        with open(path, mode) as file:
-            json.dump(data, file, indent=indent)
+    def write_json(
+            path: str,
+            data: "dict | list",
+            mode: str = 'w',
+            indent: int = 2,
+            ensure_ascii: bool = True,
+            encoding='utf-8'
+    ) -> None:
+        Dir.create(dirname(path), stdout=False)
+        with open(path, mode, encoding=encoding) as file:
+            json.dump(data, file, ensure_ascii=ensure_ascii, indent=indent)
 
     @staticmethod
     def unpacking(archive_path: str, execute_path: str, delete_archive: bool = False, stdout: bool = True) -> None:
