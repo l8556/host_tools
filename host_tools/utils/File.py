@@ -247,12 +247,12 @@ class File:
             indent: int = 2,
             ensure_ascii: bool = True,
             encoding: str = 'utf-8',
-            ends_with_line: bool = True
+            ends_with_blank_line: bool = False
     ) -> None:
         Dir.create(dirname(path), stdout=False)
         with open(path, mode, encoding=encoding) as file:
             json.dump(data, file, ensure_ascii=ensure_ascii, indent=indent)
-            if ends_with_line:
+            if ends_with_blank_line:
                 file.write('\n')
 
     @staticmethod
