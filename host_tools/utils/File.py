@@ -246,7 +246,7 @@ class File:
             mode: str = 'w',
             indent: int = 2,
             ensure_ascii: bool = True,
-            encoding='utf-8'
+            encoding: str = 'utf-8'
     ) -> None:
         Dir.create(dirname(path), stdout=False)
         with open(path, mode, encoding=encoding) as file:
