@@ -246,11 +246,14 @@ class File:
             mode: str = 'w',
             indent: int = 2,
             ensure_ascii: bool = True,
-            encoding: str = 'utf-8'
+            encoding: str = 'utf-8',
+            ends_with_line: bool = True
     ) -> None:
         Dir.create(dirname(path), stdout=False)
         with open(path, mode, encoding=encoding) as file:
             json.dump(data, file, ensure_ascii=ensure_ascii, indent=indent)
+            if ends_with_line:
+                file.write('\n')
 
     @staticmethod
     def unpacking(archive_path: str, execute_path: str, delete_archive: bool = False, stdout: bool = True) -> None:
