@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from platform import system, machine, version
+from platform import system, machine, version, release
 
 from .Unix import Unix
 from ..singleton import singleton
@@ -11,6 +11,7 @@ class HostInfo:
         self.__os = None
         self.__arch = None
         self.__version = None
+        self.__release = None
 
     @property
     def os(self) -> str:
@@ -34,8 +35,14 @@ class HostInfo:
 
     def name(self, pretty: bool = False) -> str:
         if self.os == 'windows':
-            return self.os
+            return f"{self.os} {self.release}" if pretty else self.os
         return Unix().pretty_name if pretty else Unix().id
+
+    @property
+    def release(self) -> str:
+        if self.__release is None:
+            self.__release = release().lower()
+        return self.__release
 
     @property
     def version(self) -> str:
