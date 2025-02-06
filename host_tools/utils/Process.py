@@ -3,7 +3,7 @@ import psutil
 from rich import print
 
 def terminate(names: "list | str") -> None:
-    names = {names.lower()} if isinstance(names, str) else {name.lower() for name in names}
+    names = {names} if isinstance(names, str) else {name for name in names}
 
     for process in psutil.process_iter():
         if get_name(process) in names:
