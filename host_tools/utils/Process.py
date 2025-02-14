@@ -3,14 +3,19 @@ import psutil
 from rich import print
 
 def terminate(names: "list | str") -> None:
-    names = {names.lower()} if isinstance(names, str) else {name.lower() for name in names}
+    names = {names} if isinstance(names, str) else {name for name in names}
 
     for process in psutil.process_iter():
         if get_name(process) in names:
             try:
                 process.kill()
+
             except psutil.NoSuchProcess:
                 print(f"[bold red]|ERROR| Exception when terminating process {process.name()}")
+
+            except psutil.AccessDenied:
+                print(f"[bold red]|ERROR| AccessDenied when terminating process {process.name()}")
+
 
 def get_name(process: psutil.Process) -> str:
     try:
