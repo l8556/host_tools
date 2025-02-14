@@ -9,8 +9,13 @@ def terminate(names: "list | str") -> None:
         if get_name(process) in names:
             try:
                 process.kill()
+
             except psutil.NoSuchProcess:
                 print(f"[bold red]|ERROR| Exception when terminating process {process.name()}")
+
+            except psutil.AccessDenied:
+                print(f"[bold red]|ERROR| AccessDenied when terminating process {process.name()}")
+
 
 def get_name(process: psutil.Process) -> str:
     try:
