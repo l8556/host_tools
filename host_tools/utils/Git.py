@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import Shell
+from . import Shell
 
 
 def clone(repo: str, branch: str = None, path: str = None) -> None:
