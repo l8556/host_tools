@@ -11,6 +11,7 @@ class HostInfo:
     __linux = 'linux'
     __mac = 'mac'
     __darwin = 'darwin'
+    __supported_os = [__windows, __linux, __mac, __darwin]
 
     def __init__(self):
         self.__os = None
@@ -23,7 +24,7 @@ class HostInfo:
         if self.__os is None:
             self.__os = system().lower()
 
-            if self.__os not in [self.__linux, self.__darwin, self.__windows]:
+            if self.__os not in self.__supported_os:
                 print(f"[bold red]|ERROR| Error defining os: {self.__os}")
                 self.__os = ''
 
