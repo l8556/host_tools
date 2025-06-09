@@ -47,7 +47,7 @@ def run(
             completed_process = CompletedProcess(process.args, process.returncode, _stdout.strip(), _stderr.strip())
 
         except TimeoutExpired:
-            children_processes = psutil.Process(process.pid).children() if kill_children_processes else None
+            children_processes = psutil.Process(process.pid).children(recursive=True) if kill_children_processes else None
             process.kill()
 
             if children_processes:
