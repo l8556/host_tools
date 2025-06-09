@@ -5,7 +5,7 @@ from random import choice
 
 
 def delete_last_slash(path: str) -> str:
-    return path.rstrip(path[-1]) if path[-1] in ['/', '\\'] else path
+    return path.rstrip('/\\')
 
 def get_random(chars=string.ascii_uppercase + string.digits, num_chars=50) -> str:
     return ''.join(choice(chars).lower() for _ in range(int(num_chars)))
