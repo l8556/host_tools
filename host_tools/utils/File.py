@@ -182,6 +182,59 @@ class File:
             else:
                 print(f'[green]|INFO| Deleted: {_path}') if stdout else ...
 
+
+    @staticmethod
+    def set_file_metadata(file_path: str, metadata_name: str, metadata_value: str) -> None:
+        """
+        Write metadata to file using Alternate Data Streams (Windows only).
+
+        :param file_path: Path to the file
+        :param metadata_name: Name of the metadata field
+        :param metadata_value: Value to store in metadata
+        """
+        if system().lower() != 'windows':
+            return print('[yellow]|WARNING| File metadata (ADS) is only supported on Windows')
+
+        if not exists(file_path):
+            return print(f'[red]|ERROR| File not exist: {file_path}')
+
+        ads_path = f'{file_path}:{metadata_name}'
+        try:
+            with open(ads_path, 'w', encoding='utf-8') as f:
+                f.write(metadata_value)
+            print(f'[green]|INFO| Metadata "{metadata_name}" written to: {file_path}')
+        except Exception as e:
+            print(f'[red]|ERROR| Failed to write metadata: {e}')
+
+    @staticmethod
+    def get_file_metadata(file_path: str, metadata_name: str) -> Optional[str]:
+        """
+        Read metadata from file using Alternate Data Streams (Windows only).
+
+        :param file_path: Path to the file
+        :param metadata_name: Name of the metadata field
+        :return: Metadata value or None if not found
+        """
+        if system().lower() != 'windows':
+            print('[yellow]|WARNING| File metadata (ADS) is only supported on Windows')
+            return None
+
+        if not exists(file_path):
+            print(f'[red]|ERROR| File not exist: {file_path}')
+            return None
+
+        ads_path = f'{file_path}:{metadata_name}'
+        try:
+            with open(ads_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            print(f'[yellow]|WARNING| Metadata "{metadata_name}" not found in: {file_path}')
+            return None
+        except Exception as e:
+            print(f'[red]|ERROR| Failed to read metadata: {e}')
+            return None
+
+
     @staticmethod
     def compress(
             path: str,
@@ -190,7 +243,9 @@ class File:
             compress_type: int = 8,
             stdout: bool = False,
             stderr: bool = True,
-            progress_bar: bool = True
+            progress_bar: bool = True,
+            comment: str = None,
+            comment_encoding: str = 'utf-8'
     ) -> None:
         """
         :param stdout:
@@ -200,6 +255,8 @@ class File:
         :param path: Path to compression files.
         :param archive_path: Path to the archive file.
         :param delete:  Deleting files after compression.
+        :param comment: Additional information to store in archive metadata.
+        :param comment_encoding: Encoding of the comment.
         """
         _name = basename(Str.delete_last_slash(path))
         _archive_path = archive_path or join(dirname(path) if isfile(path) else path, f"{_name}.zip")
@@ -228,14 +285,29 @@ class File:
                 _zip.write(path, _name, compress_type=compress_type)
                 File.delete(path, stdout=False) if delete else None
 
+            if comment:
+                _zip.comment = comment.encode(comment_encoding)
+
         if stderr and not exists(_archive_path) or getsize(_archive_path) == 0:
             return print(f"[ERROR] Archive not exists: {_archive_path}")
 
         print(f"[green]|INFO| Success compressed: {_archive_path}") if stdout else None
 
+    @staticmethod
+    def get_archive_comment(archive_path: str, comment_encoding: str = 'utf-8') -> Optional[str]:
+        """
+        Get the comment from a zip archive.
+
+        :param archive_path: Path to the zip archive.
+        :param comment_encoding: Encoding of the comment.
+        :return: The comment from the zip archive.
+        """
+        with ZipFile(archive_path, 'r') as _zip:
+            comment = _zip.comment.decode(comment_encoding)
+            return comment if comment else None
 
     @staticmethod
-    def read_json(path_to_json: str, encoding: str = "utf_8_sig") -> json:
+    def read_json(path_to_json: str, encoding: str = "utf_8_sig") -> dict:
         with codecs_open(path_to_json, mode="r", encoding=encoding) as file:
             return json.load(file)
 
