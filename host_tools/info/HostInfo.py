@@ -11,6 +11,7 @@ class HostInfo:
     __linux = 'linux'
     __mac = 'mac'
     __darwin = 'darwin'
+    __arm_arch = ['aarch64', 'arm64']
     __supported_os = [__windows, __linux, __mac, __darwin]
 
     def __init__(self):
@@ -44,6 +45,10 @@ class HostInfo:
     @property
     def is_mac(self) -> bool:
         return self.os == self.__mac
+
+    @property
+    def is_arm(self) -> bool:
+        return self.arch in self.__arm_arch
 
     @property
     def arch(self) -> str:
