@@ -1,27 +1,31 @@
-[tool.poetry]
+[project]
 name = "host-tools"
 version = "2.05"
 description = ""
-authors = ["l02 <l8556@outlook.com>"]
+authors = [{ name = "l02", email = "l8556@outlook.com" }]
 readme = "README.md"
-repository='https://github.com/l8556/host_tools'
-classifiers=[
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: Implementation :: PyPy',
-    'Programming Language :: Python :: Implementation :: CPython',
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+    "python-xlib>=0.33",
+    "py7zr>=1.1.0",
+    "pywin32>=312 ; sys_platform == 'win32'",
+    "distro>=1.9.0",
+    "requests>=2.34.2",
+    "rich>=15.0.0",
 ]
 
-
-[tool.poetry.dependencies]
-python = ">=3.12"
-python-xlib = "*"
-py7zr = "*"
-pywin32 = { version = "*", markers = "sys_platform == 'win32'" }
-distro = "*"
-requests = "*"
-rich = "*"
-
+[project.urls]
+repository = "https://github.com/l8556/host_tools"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "host_tools"
