@@ -65,4 +65,5 @@ def run(
         finally:
             print(completed_process.stderr) if stderr and completed_process.stderr else None
             print(completed_process.stdout) if stdout and completed_process.stdout else None
-            return completed_process
+
+    return completed_process
